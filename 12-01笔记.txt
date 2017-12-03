@@ -1,0 +1,37 @@
+三种操作数据库数据的方式：
+1.spring-jdbc：
+	@Autowired
+    	JdbcTemplate jdbcTemplate;
+	（不传参）
+	jdbcTemplate.execute("DROP TABLE IF EXISTS customers");
+	（传参   List<Object[]> newData）	
+	 jdbcTemplate.batchUpdate("INSERT INTO customers(first_name, last_name) VALUES (?,?)",newData);
+
+
+2.entitymanager：
+	@PersistenceContext
+	private EntityManager entityManager;
+	
+	（使用实体）
+	Employees emp = entityManager.find(Employees.class, id);（先获取实体）
+        emp.setName(name);（修改实体）
+        entityManager.persist(emp);（添加实体）
+	
+	（使用jpql  注意Student是实体类名）
+	entityManager.createQuery("update Student s set s.sname = ?1 where s.sid=?2")
+		     .setParameter(1, sname)
+		     .setParameter(2, sid)
+		     .executeUpdate();
+	
+
+3.spring data jpa：
+	创建StudentRepository
+	继承JpaRepository<Student, Integer>,JpaSpecificationExecutor<Student>
+			（实体类）（主键类型）                      （实体类）
+	
+	①使用自带的方法
+	②使用自定义的Query语句（hql）
+		@Transactional（开启事务管理）
+		@Modifying（允许修改）
+		@Query("update Student s set s.sname=:sname where s.sid=:sid")（执行语句）
+		void updateBySname(@Param("sname") String sname,@Param("sid") Integer sid);（传入参数，执行方法）
